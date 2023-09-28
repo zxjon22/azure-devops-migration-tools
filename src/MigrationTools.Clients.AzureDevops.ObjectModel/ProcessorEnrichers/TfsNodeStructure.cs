@@ -168,7 +168,19 @@ namespace MigrationTools.Enrichers
                     _pathToKnownNodeMap.TryGetValue(currentAncestorPath, out parentNode);
                     if (parentNode == null)
                     {
-                        parentNode= _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
+                        try
+                        {
+                            // This has started throwing exceptions it seems if the node path
+                            // doesn't exist.
+                            parentNode = _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
+                        }
+                        catch (CommonStructureSubsystemException ex)
+                        {
+                            if (!ex.Message.StartsWith("TF200014"))
+                            {
+                                throw;
+                            }
+                        }
                     }
                 }
                 else
